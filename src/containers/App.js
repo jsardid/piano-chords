@@ -3,18 +3,25 @@ import WebMidi from "webmidi";
 import styled from "styled-components";
 import { Keyboard } from "./../components/keyboard/Keyboard";
 import { Visor } from "./../components/visor/Visor";
+import {
+  getChordNameFromNotes,
+  sortKeys,
+  getNotesFromKeys
+} from "../services/notesService";
 
 class App extends Component {
-  state = { notesOn: [] };
+  state = { keysOn: [], notesOn: [], chordName: "" };
 
   render() {
     return (
       <AppStyled>
+        <GameLayout>
+        </GameLayout>
         <VisorLayout>
-          <Visor notesOn={this.state.notesOn} />
+          <Visor keysOn={this.state.keysOn.map(key => `${key.name}${key.octave}`)} notesOn={this.state.notesOn} chordName={this.state.chordName} />
         </VisorLayout>
         <KeyboardLayout>
-          <Keyboard notesOn={this.state.notesOn}/>
+          <Keyboard notesOn={this.state.keysOn.map(key => `${key.name}${key.octave}`)} />
         </KeyboardLayout>
       </AppStyled>
     );
@@ -22,23 +29,30 @@ class App extends Component {
 
   componentDidMount() {
     WebMidi.enable(() => {
-      const input = WebMidi.inputs[0];
+      if (WebMidi.inputs.length > 0) {
+        const input = WebMidi.inputs[0];
 
-      input.addListener("noteon", "all", e => {
-        this.setState(prevState => {
-          prevState.notesOn.push(e.note.name + e.note.octave);
-          return prevState;
+        input.addListener("noteon", "all", e => {
+          this.setState(prevState => {
+            prevState.keysOn.push(e.note);
+            prevState.keysOn = sortKeys(prevState.keysOn);
+            prevState.notesOn = getNotesFromKeys(prevState.keysOn);
+            prevState.chordName = getChordNameFromNotes(prevState.notesOn);
+            return prevState;
+          });
         });
-      });
 
-      input.addListener("noteoff", "all", e => {
-        this.setState(prevState => {
-          prevState.notesOn = prevState.notesOn.filter(
-            note => note !== e.note.name + e.note.octave
-          );
-          return prevState;
+        input.addListener("noteoff", "all", e => {
+          this.setState(prevState => {
+            prevState.keysOn = prevState.keysOn.filter(
+              note => note.number !== e.note.number
+            );
+            prevState.notesOn = getNotesFromKeys(prevState.keysOn);
+            prevState.chordName = getChordNameFromNotes(prevState.notesOn);
+            return prevState;
+          });
         });
-      });
+      }
     });
   }
 }
@@ -47,16 +61,22 @@ const AppStyled = styled.div`
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #a8a7d3;
+  background: radial-gradient(#a8a7d3, #7d7cb0);
 `;
 
-const VisorLayout = styled.div`
+const GameLayout = styled.div`
   height: 500px;
   flex-grow: 1;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+`;
+
+const VisorLayout = styled.div`
+  height: 75px;
+  width: 100%;
+  margin-bottom: 15px;
 `;
 
 const KeyboardLayout = styled.div`

@@ -4,11 +4,19 @@ import styled from "styled-components";
 export const Visor = props => {
   return (
     <VisorStyled>
-      <Notes>
-        {props.notesOn.map((note, i) => {
-          return <span>{note}</span>;
+      <KeysDisplay>
+        {props.keysOn.map((key, i) => {
+          return <Note>{key}</Note>;
         })}
-      </Notes>
+      </KeysDisplay>
+      <NotesDisplay>
+        {props.notesOn.map((note, i) => {
+          return <Note>{note}</Note>;
+        })}
+      </NotesDisplay>
+      <ChordDisplay>
+        <span>{props.chordName}</span>
+      </ChordDisplay>
     </VisorStyled>
   );
 };
@@ -18,8 +26,44 @@ const VisorStyled = styled.div`
   justify-content: center;
 `;
 
-const Notes = styled.div`
-  width: 300px;
+const KeysDisplay = styled.div`
+  width: 510px;
   height: 75px;
-  background-color: #ffffff55;
+  background-color: #ffffff30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00000077;
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const ChordDisplay = styled.div`
+  width: 510px;
+  height: 75px;
+  background-color: #ffffff30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00000077;
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const NotesDisplay = styled.div`
+  width: 510px;
+  height: 75px;
+  background-color: #ffffff30;
+  margin: 0px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00000077;
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+
+const Note = styled.div`
+  margin: 0px 5px;
 `;
