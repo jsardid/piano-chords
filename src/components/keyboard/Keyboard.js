@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Key } from "./../key/Key";
+import { Key } from "./Key";
 
 export const Keyboard = props => {
   return (

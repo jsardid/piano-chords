@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import WebMidi from "webmidi";
 import styled from "styled-components";
-import { Keyboard } from "./../components/keyboard/Keyboard";
-import { Visor } from "./../components/visor/Visor";
+import { Keyboard } from "./../components/Keyboard/Keyboard";
+import { Visor } from "./../components/Visor/Visor";
+import ChordsGame from "./../components/ChordsGame/ChordsGame";
 import {
   getChordNameFromNotes,
   sortKeys,
   getNotesFromKeys
-} from "../services/notesService";
+} from "../utils/notes-service";
 
 class App extends Component {
   state = { keysOn: [], notesOn: [], chordName: "" };
@@ -16,12 +17,19 @@ class App extends Component {
     return (
       <AppStyled>
         <GameLayout>
+          <ChordsGame />
         </GameLayout>
         <VisorLayout>
-          <Visor keysOn={this.state.keysOn.map(key => `${key.name}${key.octave}`)} notesOn={this.state.notesOn} chordName={this.state.chordName} />
+          <Visor
+            keysOn={this.state.keysOn.map(key => `${key.name}${key.octave}`)}
+            notesOn={this.state.notesOn}
+            chordName={this.state.chordName}
+          />
         </VisorLayout>
         <KeyboardLayout>
-          <Keyboard notesOn={this.state.keysOn.map(key => `${key.name}${key.octave}`)} />
+          <Keyboard
+            notesOn={this.state.keysOn.map(key => `${key.name}${key.octave}`)}
+          />
         </KeyboardLayout>
       </AppStyled>
     );
