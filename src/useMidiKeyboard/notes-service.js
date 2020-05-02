@@ -26,19 +26,28 @@ export function getNotesFromKeys(keys) {
   return sortKeys(unicNotes);
 }
 
-export function getChordNameFromNotes(notes) {
-  const chordsMatch = chordsList.filter(chord =>
-    isSameChord(chord.notes, notes)
-  );
-  return chordsMatch.length === 0
-    ? ""
-    : `${chordsMatch[0].key} ${chordsMatch[0].type}`;
-}
 
-function isSameChord(chord1, chord2) {
-  return chord1.length !== chord2.length
-    ? false
-    : chord1.filter(
-        noteChord1 => !chord2.find(noteChord2 => notesList[noteChord2].value === notesList[noteChord1].value)
-      ).length === 0;
-}
+
+export const notesList = {
+  Cb: { order: 1, value: 12 },
+  C: { order: 2, value: 1 },
+  "C#": { order: 3, value: 2 },
+  Db: { order: 4, value: 2 },
+  D: { order: 5, value: 3 },
+  "D#": { order: 6, value: 4 },
+  Eb: { order: 7, value: 4 },
+  E: { order: 8, value: 5 },
+  "E#": { order: 9, value: 6 },
+  Fb: { order: 10, value: 5 },
+  F: { order: 11, value: 6 },
+  "F#": { order: 12, value: 7 },
+  Gb: { order: 13, value: 7 },
+  G: { order: 14, value: 8 },
+  "G#": { order: 15, value: 9 },
+  Ab: { order: 16, value: 9 },
+  A: { order: 17, value: 10 },
+  "A#": { order: 18, value: 11 },
+  Bb: { order: 19, value: 11 },
+  B: { order: 20, value: 12 },
+  "B#": { order: 21, value: 1 }
+};

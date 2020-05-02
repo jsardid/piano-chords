@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-export const Key = props => {
+export const Key = (props) => {
   return props.type === "white" ? (
     <WhiteKey pressed={props.pressed} />
   ) : (
@@ -12,8 +12,10 @@ export const Key = props => {
 const WhiteKey = styled.div`
   height: 100%;
   width: 28px;
-  background-color: ${props => (props.pressed ? "red" : "#eee")};
+  background-color: ${(props) => (props.pressed ? "red" : "#eee")};
   margin: 1px;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
 `;
 
 const BlackKey = styled.div`
@@ -22,5 +24,7 @@ const BlackKey = styled.div`
   margin-left: -10px;
   margin-right: -10px;
   z-index: 10;
-  background-color: ${props => (props.pressed ? "red" : "#222")};
+  background-color: ${(props) => (props.pressed ? "red" : "#222")};
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
 `;

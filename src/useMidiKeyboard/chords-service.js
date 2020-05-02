@@ -24,3 +24,20 @@ export const chordsList = [
   { type: "Minor", key: "Bb", notes: ["Bb", "Db", "F"] },
   { type: "Minor", key: "B", notes: ["B", "D", "F#"] }
 ];
+
+const isSameChord = (chord1, chord2) => {
+  return chord1.length !== chord2.length
+    ? false
+    : chord1.filter(
+        noteChord1 => !chord2.find(noteChord2 => notesList[noteChord2].value === notesList[noteChord1].value)
+      ).length === 0;
+}
+
+export const getChordNameFromNotes = (notes) => {
+  const chordsMatch = chordsList.filter(chord =>
+    isSameChord(chord.notes, notes)
+  );
+  return chordsMatch.length === 0
+    ? ""
+    : `${chordsMatch[0].key} ${chordsMatch[0].type}`;
+}
