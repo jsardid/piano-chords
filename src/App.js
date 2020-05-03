@@ -5,10 +5,11 @@ import { Visor } from "./visor/Visor";
 import useMidiKeyboard from "./useMidiKeyboard/useMidiKeyboard";
 
 const App = () => {
-  const { activeKeys, activeNotes } = useMidiKeyboard();
+  const { activeKeys, activeNotes, availableInputs } = useMidiKeyboard();
   return (
     <AppContainer>
       <Keyboard activeKeys={activeKeys} />
+      <div>Inputs: {JSON.stringify(availableInputs)}</div>
     </AppContainer>
   );
 };

@@ -1,8 +1,45 @@
 import React, { useState, useEffect } from "react";
 import WebMidi from "webmidi";
 
+const getMidiInputs = (midiAccess) => {
+  const inputs = [];
+  midiAccess.inputs.forEach((port, key) => {
+    inputs.push({
+      id: port.id,
+      manufacturer: port.manufacturer,
+      name: port.name,
+    });
+  });
+  return inputs;
+};
+
 const useMidiKeyboard = () => {
+  const [midiAccess, setMidiAccess] = useState();
+  const [midiAccessState, setMidiAccessState] = useState("idle");
   const [activeKeys, setActiveKeys] = useState([]);
+  const [availableInputs, setAvailableInputs] = useState([]);
+  const [selectedInput, setSelectedInput] = useState();
+
+  useEffect(() => {
+    navigator.requestMIDIAccess().then(
+      (midiAccess) => {
+        setMidiAccess(midiAccess);
+        setMidiAccessState("success");
+      },
+      () => {
+        setMidiAccessState("error");
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (midiAccess) {
+      setAvailableInputs(getMidiInputs(midiAccess));
+      midiAccess.onstatechange = function (e) {
+        setAvailableInputs(getMidiInputs(e.target));
+      };
+    }
+  }, [midiAccess]);
 
   useEffect(() => {
     WebMidi.enable(() => {
@@ -25,6 +62,7 @@ const useMidiKeyboard = () => {
   }, []);
 
   return {
+    availableInputs,
     activeKeys: getSortedActiveKeys(activeKeys),
     activeNotes: getUniqueNotes(activeKeys),
   };
