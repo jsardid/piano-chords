@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import WebMidi from "webmidi";
 
 const getMidiInputs = (midiAccess) => {
@@ -13,35 +13,74 @@ const getMidiInputs = (midiAccess) => {
   return inputs;
 };
 
-const useMidiKeyboard = () => {
-  const [midiAccess, setMidiAccess] = useState();
-  const [midiAccessState, setMidiAccessState] = useState("idle");
-  const [activeKeys, setActiveKeys] = useState([]);
-  const [availableInputs, setAvailableInputs] = useState([]);
-  const [selectedInput, setSelectedInput] = useState();
+const initialState = {
+  midiAccessState: "idle",
+  selectedInput: null,
+  activeKeys: [],
+  availableInputs: [],
+};
 
-  useEffect(() => {
-    navigator.requestMIDIAccess().then(
-      (midiAccess) => {
-        setMidiAccess(midiAccess);
-        setMidiAccessState("success");
-      },
-      () => {
-        setMidiAccessState("error");
-      }
-    );
-  }, []);
-
-  useEffect(() => {
-    if (midiAccess) {
-      setAvailableInputs(getMidiInputs(midiAccess));
-      midiAccess.onstatechange = function (e) {
-        setAvailableInputs(getMidiInputs(e.target));
+function reducer(state, action) {
+  switch (action.type) {
+    case "MIDI_ACCESS_APPROVED": {
+      const inputs = getMidiInputs(action.midiAccess);
+      return {
+        ...state,
+        midiAccessState: "approved",
+        availableInputs: inputs,
+        selectedInput: inputs[0] ? inputs[0].id : null,
       };
     }
-  }, [midiAccess]);
+    case "MIDI_ACCESS_CHANGED": {
+      const inputs = getMidiInputs(action.midiAccess);
+      const newState = {
+        ...state,
+        availableInputs: inputs,
+      };
+      if (!inputs.find((input) => (input.id === state.selectedInput))) {
+        newState.selectedInput = inputs[0] ? inputs[0].id : null;
+      }
+      return newState;
+    }
+    case "MIDI_ACCESS_REJECTED": {
+      return {
+        ...state,
+        midiAccessState: "rejected",
+      };
+    }
+    default:
+      throw new Error();
+  }
+}
+
+const useMidiKeyboard = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { midiAccessState, selectedInput, activeKeys, availableInputs } = state;
 
   useEffect(() => {
+    const initialize = async () => {
+      try {
+        const midiAccess = await navigator.requestMIDIAccess();
+        dispatch({
+          type: "MIDI_ACCESS_APPROVED",
+          midiAccess,
+        });
+        midiAccess.onstatechange = (event) => {
+          dispatch({
+            type: "MIDI_ACCESS_CHANGED",
+            midiAccess: event.target,
+          });
+        };
+      } catch (error) {
+        dispatch({
+          type: "MIDI_ACCESS_REJECTED",
+        });
+      }
+    };
+    initialize();
+  }, []);
+
+  /*useEffect(() => {
     WebMidi.enable(() => {
       if (WebMidi.inputs.length > 0) {
         const input = WebMidi.inputs[0];
@@ -59,10 +98,11 @@ const useMidiKeyboard = () => {
         });
       }
     });
-  }, []);
+  }, []);*/
 
   return {
     availableInputs,
+    selectedInput,
     activeKeys: getSortedActiveKeys(activeKeys),
     activeNotes: getUniqueNotes(activeKeys),
   };
